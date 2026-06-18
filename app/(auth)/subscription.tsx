@@ -1,6 +1,6 @@
 // app/(auth)/subscription.tsx
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useCallback, useMemo } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 
 // Placeholder subscription plans
@@ -13,33 +13,41 @@ const plans = [
 export default function SubscriptionScreen() {
   const router = useRouter();
 
-  const handleSelect = (planId: string) => {
+  const handleSelect = useCallback((planId: string) => {
     // TODO: integrate Stripe/PayPal checkout
     console.log('Selected plan', planId);
     router.replace('/(tabs)/home');
-  };
+  }, [router]);
+
+  // useMemo prevents re-mapping the plans array on every render
+  const renderedPlans = useMemo(() => plans.map(plan => (
+    <View key={plan.id} style={styles.planCard}>
+      <Text style={styles.planName}>{plan.name}</Text>
+      <Text style={styles.planPrice}>{plan.price}</Text>
+      {plan.features.map((feat, i) => (
+        <Text key={i} style={styles.feature}>• {feat}</Text>
+      ))}
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => handleSelect(plan.id)}
+        activeOpacity={0.7}
+      >
+        <Text style={styles.buttonText}>Select {plan.name}</Text>
+      </TouchableOpacity>
+    </View>
+  )), [handleSelect]);
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <Text style={styles.title}>Choose Your Plan</Text>
-      {plans.map(plan => (
-        <View key={plan.id} style={styles.planCard}>
-          <Text style={styles.planName}>{plan.name}</Text>
-          <Text style={styles.planPrice}>{plan.price}</Text>
-          {plan.features.map((feat, i) => (
-            <Text key={i} style={styles.feature}>• {feat}</Text>
-          ))}
-          <TouchableOpacity style={styles.button} onPress={() => handleSelect(plan.id)}>
-            <Text style={styles.buttonText}>Select {plan.name}</Text>
-          </TouchableOpacity>
-        </View>
-      ))}
-    </View>
+      {renderedPlans}
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#fff' },
+  container: { flex: 1, backgroundColor: '#fff' },
+  contentContainer: { padding: 20 },
   title: { fontSize: 28, fontWeight: '600', marginBottom: 20, textAlign: 'center' },
   planCard: { borderWidth: 1, borderColor: '#ddd', borderRadius: 10, padding: 15, marginBottom: 15 },
   planName: { fontSize: 22, fontWeight: '600' },
