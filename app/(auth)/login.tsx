@@ -1,27 +1,61 @@
 // app/(auth)/login.tsx
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import React, { useState, useCallback, useMemo } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { supabase } from '../../services/supabase';
 import { useRouter } from 'expo-router';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = async () => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      Alert.alert('Login Failed', error.message);
-    } else {
-      router.replace('/(tabs)/home');
+  // useCallback prevents function recreation on every keystroke
+  const handleLogin = useCallback(async () => {
+    if (isLoading) return;
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        Alert.alert('Login Failed', error.message);
+      } else {
+        router.replace('/(tabs)/home');
+      }
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, [email, password, router, isLoading]);
 
-  const handleSocialLogin = async (provider) => {
-    const { error } = await supabase.auth.signInWithOAuth({ provider });
-    if (error) Alert.alert('Social Login Error', error.message);
-  };
+  const handleSocialLogin = useCallback(async (provider) => {
+    if (isLoading) return;
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({ provider });
+      if (error) Alert.alert('Social Login Error', error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isLoading]);
+
+  // useMemo prevents re-rendering of static UI parts on every keystroke
+  const socialButtons = useMemo(() => (
+    <View style={styles.socialContainer}>
+      <TouchableOpacity
+        onPress={() => handleSocialLogin('google')}
+        style={styles.socialButton}
+        disabled={isLoading}
+      >
+        <Text>Google</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => handleSocialLogin('apple')}
+        style={styles.socialButton}
+        disabled={isLoading}
+      >
+        <Text>Apple</Text>
+      </TouchableOpacity>
+    </View>
+  ), [handleSocialLogin, isLoading]);
 
   return (
     <View style={styles.container}>
@@ -33,6 +67,7 @@ export default function LoginScreen() {
         autoCapitalize="none"
         keyboardType="email-address"
         style={styles.input}
+        editable={!isLoading}
       />
       <TextInput
         placeholder="Password"
@@ -40,18 +75,16 @@ export default function LoginScreen() {
         onChangeText={setPassword}
         secureTextEntry
         style={styles.input}
+        editable={!isLoading}
       />
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
+      <TouchableOpacity
+        style={[styles.button, isLoading && { opacity: 0.7 }]}
+        onPress={handleLogin}
+        disabled={isLoading}
+      >
+        {isLoading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Login</Text>}
       </TouchableOpacity>
-      <View style={styles.socialContainer}>
-        <TouchableOpacity onPress={() => handleSocialLogin('google')} style={styles.socialButton}>
-          <Text>Google</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleSocialLogin('apple')} style={styles.socialButton}>
-          <Text>Apple</Text>
-        </TouchableOpacity>
-      </View>
+      {socialButtons}
     </View>
   );
 }

@@ -1,6 +1,6 @@
 // app/(auth)/signup.tsx
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { supabase } from '../../services/supabase';
 import { useRouter } from 'expo-router';
 
@@ -10,19 +10,30 @@ export default function SignupScreen() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSignup = async () => {
+  // useCallback prevents function recreation on every keystroke
+  const handleSignup = useCallback(async () => {
+    if (isLoading) return;
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
-    const { error: signupError } = await supabase.auth.signUp({ email, password });
-    if (signupError) {
-      setError(signupError.message);
-    } else {
-      router.replace('/(tabs)/home');
+
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const { error: signupError } = await supabase.auth.signUp({ email, password });
+      if (signupError) {
+        setError(signupError.message);
+      } else {
+        router.replace('/(tabs)/home');
+      }
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, [email, password, confirmPassword, router, isLoading]);
 
   return (
     <View style={styles.container}>
@@ -35,6 +46,7 @@ export default function SignupScreen() {
         onChangeText={setEmail}
         autoCapitalize="none"
         keyboardType="email-address"
+        editable={!isLoading}
       />
       <TextInput
         placeholder="Password"
@@ -42,6 +54,7 @@ export default function SignupScreen() {
         value={password}
         onChangeText={setPassword}
         secureTextEntry
+        editable={!isLoading}
       />
       <TextInput
         placeholder="Confirm Password"
@@ -49,11 +62,16 @@ export default function SignupScreen() {
         value={confirmPassword}
         onChangeText={setConfirmPassword}
         secureTextEntry
+        editable={!isLoading}
       />
-      <TouchableOpacity style={styles.button} onPress={handleSignup}>
-        <Text style={styles.buttonText}>Sign Up</Text>
+      <TouchableOpacity
+        style={[styles.button, isLoading && { opacity: 0.7 }]}
+        onPress={handleSignup}
+        disabled={isLoading}
+      >
+        {isLoading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Sign Up</Text>}
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => router.push('/(auth)/login')}>
+      <TouchableOpacity onPress={() => router.push('/(auth)/login')} disabled={isLoading}>
         <Text style={styles.link}>Back to Login</Text>
       </TouchableOpacity>
     </View>
