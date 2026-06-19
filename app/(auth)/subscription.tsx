@@ -24,9 +24,9 @@ export default function SubscriptionScreen() {
     <View key={plan.id} style={styles.planCard}>
       <Text style={styles.planName}>{plan.name}</Text>
       <Text style={styles.planPrice}>{plan.price}</Text>
-      {plan.features.map((feat, i) => (
-        <Text key={i} style={styles.feature}>• {feat}</Text>
-      ))}
+      <Text style={styles.feature}>
+        {plan.features.map(feat => `• ${feat}`).join('\n')}
+      </Text>
       <TouchableOpacity
         style={styles.button}
         onPress={() => handleSelect(plan.id)}
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   planCard: { borderWidth: 1, borderColor: '#ddd', borderRadius: 10, padding: 15, marginBottom: 15 },
   planName: { fontSize: 22, fontWeight: '600' },
   planPrice: { fontSize: 18, color: '#4F46E5', marginVertical: 5 },
-  feature: { fontSize: 14, color: '#555' },
+  feature: { fontSize: 14, color: '#555', lineHeight: 20 },
   button: { backgroundColor: '#4F46E5', padding: 10, borderRadius: 8, marginTop: 10, alignItems: 'center' },
   buttonText: { color: '#fff', fontWeight: '600' },
 });
