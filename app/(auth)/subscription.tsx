@@ -24,9 +24,11 @@ export default function SubscriptionScreen() {
     <View key={plan.id} style={styles.planCard}>
       <Text style={styles.planName}>{plan.name}</Text>
       <Text style={styles.planPrice}>{plan.price}</Text>
-      {plan.features.map((feat, i) => (
-        <Text key={i} style={styles.feature}>• {feat}</Text>
-      ))}
+      {/* Optimization: Consolidating multiple Text components into one reduces native view count and shadow tree depth.
+          Since styles.feature has no vertical margins, this preserves the exact layout while improving rendering efficiency. */}
+      <Text style={styles.feature}>
+        {plan.features.map(feat => `• ${feat}`).join('\n')}
+      </Text>
       <TouchableOpacity
         style={styles.button}
         onPress={() => handleSelect(plan.id)}
