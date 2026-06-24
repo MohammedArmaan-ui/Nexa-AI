@@ -1,5 +1,5 @@
 // app/(auth)/signup.tsx
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { supabase } from '../../services/supabase';
 import { useRouter } from 'expo-router';
@@ -35,9 +35,18 @@ export default function SignupScreen() {
     }
   }, [email, password, confirmPassword, router, isLoading]);
 
+  // useMemo prevents re-rendering of static UI parts on every keystroke
+  const header = useMemo(() => <Text style={styles.title}>Create Account</Text>, []);
+
+  const footer = useMemo(() => (
+    <TouchableOpacity onPress={() => router.push('/(auth)/login')} disabled={isLoading}>
+      <Text style={styles.link}>Back to Login</Text>
+    </TouchableOpacity>
+  ), [router, isLoading]);
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Create Account</Text>
+      {header}
       {error ? <Text style={styles.error}>{error}</Text> : null}
       <TextInput
         placeholder="Email"
@@ -71,9 +80,7 @@ export default function SignupScreen() {
       >
         {isLoading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Sign Up</Text>}
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => router.push('/(auth)/login')} disabled={isLoading}>
-        <Text style={styles.link}>Back to Login</Text>
-      </TouchableOpacity>
+      {footer}
     </View>
   );
 }
