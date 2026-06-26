@@ -24,9 +24,15 @@ export default function SubscriptionScreen() {
     <View key={plan.id} style={styles.planCard}>
       <Text style={styles.planName}>{plan.name}</Text>
       <Text style={styles.planPrice}>{plan.price}</Text>
-      {plan.features.map((feat, i) => (
-        <Text key={i} style={styles.feature}>• {feat}</Text>
-      ))}
+      {/*
+        PERFORMANCE OPTIMIZATION:
+        Consolidated multiple sibling Text nodes into one using newline characters.
+        This reduces the React Native Shadow Tree (Yoga) node count by (N-1) per plan,
+        improving layout calculation speed and reducing memory overhead.
+      */}
+      <Text style={styles.feature}>
+        {plan.features.map(feat => `• ${feat}`).join('\n')}
+      </Text>
       <TouchableOpacity
         style={styles.button}
         onPress={() => handleSelect(plan.id)}
