@@ -24,9 +24,12 @@ export default function SubscriptionScreen() {
     <View key={plan.id} style={styles.planCard}>
       <Text style={styles.planName}>{plan.name}</Text>
       <Text style={styles.planPrice}>{plan.price}</Text>
-      {plan.features.map((feat, i) => (
-        <Text key={i} style={styles.feature}>• {feat}</Text>
-      ))}
+      {/* ⚡ Bolt: Consolidating features into a single Text node reduces native shadow tree complexity.
+          Safe to use here as styles.feature only contains fontSize/color and doesn't affect inter-item spacing.
+          Expected Impact: Reduces component node count by (features.length - 1) per plan card. */}
+      <Text style={styles.feature}>
+        {plan.features.map(feat => `• ${feat}`).join('\n')}
+      </Text>
       <TouchableOpacity
         style={styles.button}
         onPress={() => handleSelect(plan.id)}
