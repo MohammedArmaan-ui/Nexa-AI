@@ -24,9 +24,15 @@ export default function SubscriptionScreen() {
     <View key={plan.id} style={styles.planCard}>
       <Text style={styles.planName}>{plan.name}</Text>
       <Text style={styles.planPrice}>{plan.price}</Text>
-      {plan.features.map((feat, i) => (
-        <Text key={i} style={styles.feature}>• {feat}</Text>
-      ))}
+      {/*
+          BOLT OPTIMIZATION:
+          Consolidating sibling Text components into a single multi-line Text component.
+          This reduces the number of native views in the Shadow Tree by (n-1) per card.
+          In React Native, this is more efficient than mapping multiple individual Text components.
+      */}
+      <Text style={styles.feature}>
+        {plan.features.map(feat => `• ${feat}`).join('\n')}
+      </Text>
       <TouchableOpacity
         style={styles.button}
         onPress={() => handleSelect(plan.id)}
