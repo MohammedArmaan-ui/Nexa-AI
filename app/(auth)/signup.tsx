@@ -65,7 +65,8 @@ export default function SignupScreen() {
         editable={!isLoading}
       />
       <TouchableOpacity
-        style={[styles.button, isLoading && { opacity: 0.7 }]}
+        /* ⚡ Bolt: Use static style reference to avoid object allocation on every render */
+        style={[styles.button, isLoading && styles.buttonDisabled]}
         onPress={handleSignup}
         disabled={isLoading}
       >
@@ -83,6 +84,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, fontWeight: '600', marginBottom: 20, textAlign: 'center' },
   input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginBottom: 12 },
   button: { backgroundColor: '#4F46E5', padding: 12, borderRadius: 8, alignItems: 'center', marginTop: 8 },
+  buttonDisabled: { opacity: 0.7 },
   buttonText: { color: '#fff', fontWeight: '600' },
   link: { color: '#4F46E5', marginTop: 12, textAlign: 'center' },
   error: { color: 'red', marginBottom: 8, textAlign: 'center' },
