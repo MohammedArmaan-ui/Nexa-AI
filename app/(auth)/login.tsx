@@ -78,7 +78,8 @@ export default function LoginScreen() {
         editable={!isLoading}
       />
       <TouchableOpacity
-        style={[styles.button, isLoading && { opacity: 0.7 }]}
+        /* ⚡ Bolt: Use static style reference to avoid object allocation on every render */
+        style={[styles.button, isLoading && styles.buttonDisabled]}
         onPress={handleLogin}
         disabled={isLoading}
       >
@@ -94,6 +95,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, marginBottom: 20, fontWeight: '600' },
   input: { width: '100%', height: 48, borderWidth: 1, borderColor: '#ccc', borderRadius: 8, paddingHorizontal: 10, marginBottom: 12, backgroundColor: '#fff' },
   button: { width: '100%', height: 48, backgroundColor: '#0066ff', borderRadius: 8, justifyContent: 'center', alignItems: 'center', marginTop: 8 },
+  buttonDisabled: { opacity: 0.7 },
   buttonText: { color: '#fff', fontWeight: '600' },
   socialContainer: { flexDirection: 'row', marginTop: 16 },
   socialButton: { marginHorizontal: 8, padding: 10, backgroundColor: '#e0e0e0', borderRadius: 6 },
