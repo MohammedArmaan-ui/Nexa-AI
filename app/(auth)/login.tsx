@@ -77,8 +77,14 @@ export default function LoginScreen() {
         style={styles.input}
         editable={!isLoading}
       />
+      {/*
+          ⚡ Bolt Optimization: Using static StyleSheet references instead of inline
+          objects or dynamic arrays reduces object allocations and garbage collection
+          pressure during high-frequency re-renders (e.g., typing).
+          Impact: Smoother UI interactions and reduced frame drops.
+      */}
       <TouchableOpacity
-        style={[styles.button, isLoading && { opacity: 0.7 }]}
+        style={isLoading ? styles.buttonLoading : styles.button}
         onPress={handleLogin}
         disabled={isLoading}
       >
@@ -94,6 +100,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, marginBottom: 20, fontWeight: '600' },
   input: { width: '100%', height: 48, borderWidth: 1, borderColor: '#ccc', borderRadius: 8, paddingHorizontal: 10, marginBottom: 12, backgroundColor: '#fff' },
   button: { width: '100%', height: 48, backgroundColor: '#0066ff', borderRadius: 8, justifyContent: 'center', alignItems: 'center', marginTop: 8 },
+  buttonLoading: { width: '100%', height: 48, backgroundColor: '#0066ff', borderRadius: 8, justifyContent: 'center', alignItems: 'center', marginTop: 8, opacity: 0.7 },
   buttonText: { color: '#fff', fontWeight: '600' },
   socialContainer: { flexDirection: 'row', marginTop: 16 },
   socialButton: { marginHorizontal: 8, padding: 10, backgroundColor: '#e0e0e0', borderRadius: 6 },
