@@ -64,8 +64,14 @@ export default function SignupScreen() {
         secureTextEntry
         editable={!isLoading}
       />
+      {/*
+          ⚡ Bolt Optimization: Using static StyleSheet references instead of inline
+          objects or dynamic arrays reduces object allocations and garbage collection
+          pressure during high-frequency re-renders (e.g., typing).
+          Impact: Smoother UI interactions and reduced frame drops.
+      */}
       <TouchableOpacity
-        style={[styles.button, isLoading && { opacity: 0.7 }]}
+        style={isLoading ? styles.buttonLoading : styles.button}
         onPress={handleSignup}
         disabled={isLoading}
       >
@@ -83,6 +89,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, fontWeight: '600', marginBottom: 20, textAlign: 'center' },
   input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginBottom: 12 },
   button: { backgroundColor: '#4F46E5', padding: 12, borderRadius: 8, alignItems: 'center', marginTop: 8 },
+  buttonLoading: { backgroundColor: '#4F46E5', padding: 12, borderRadius: 8, alignItems: 'center', marginTop: 8, opacity: 0.7 },
   buttonText: { color: '#fff', fontWeight: '600' },
   link: { color: '#4F46E5', marginTop: 12, textAlign: 'center' },
   error: { color: 'red', marginBottom: 8, textAlign: 'center' },
