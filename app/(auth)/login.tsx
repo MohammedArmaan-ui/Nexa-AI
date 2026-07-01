@@ -38,6 +38,7 @@ export default function LoginScreen() {
   }, [isLoading]);
 
   // useMemo prevents re-rendering of static UI parts on every keystroke
+  // Memoizing social buttons prevents re-renders when email/password state changes
   const socialButtons = useMemo(() => (
     <View style={styles.socialContainer}>
       <TouchableOpacity
@@ -77,8 +78,13 @@ export default function LoginScreen() {
         style={styles.input}
         editable={!isLoading}
       />
+      {/*
+          BOLT OPTIMIZATION: Using a ternary operator for conditional styles
+          instead of an inline array [styles.button, isLoading && {...}]
+          avoids object/array allocations on every render cycle.
+      */}
       <TouchableOpacity
-        style={[styles.button, isLoading && { opacity: 0.7 }]}
+        style={isLoading ? styles.buttonLoading : styles.button}
         onPress={handleLogin}
         disabled={isLoading}
       >
@@ -89,11 +95,14 @@ export default function LoginScreen() {
   );
 }
 
+const buttonBase: any = { width: '100%', height: 48, backgroundColor: '#0066ff', borderRadius: 8, justifyContent: 'center', alignItems: 'center', marginTop: 8 };
+
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, backgroundColor: '#f5f5f5' },
   title: { fontSize: 24, marginBottom: 20, fontWeight: '600' },
   input: { width: '100%', height: 48, borderWidth: 1, borderColor: '#ccc', borderRadius: 8, paddingHorizontal: 10, marginBottom: 12, backgroundColor: '#fff' },
-  button: { width: '100%', height: 48, backgroundColor: '#0066ff', borderRadius: 8, justifyContent: 'center', alignItems: 'center', marginTop: 8 },
+  button: buttonBase,
+  buttonLoading: { ...buttonBase, opacity: 0.7 },
   buttonText: { color: '#fff', fontWeight: '600' },
   socialContainer: { flexDirection: 'row', marginTop: 16 },
   socialButton: { marginHorizontal: 8, padding: 10, backgroundColor: '#e0e0e0', borderRadius: 6 },
