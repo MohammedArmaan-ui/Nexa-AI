@@ -64,8 +64,13 @@ export default function SignupScreen() {
         secureTextEntry
         editable={!isLoading}
       />
+      {/*
+          BOLT OPTIMIZATION: Using a ternary operator for conditional styles
+          instead of an inline array [styles.button, isLoading && {...}]
+          avoids object/array allocations on every render cycle.
+      */}
       <TouchableOpacity
-        style={[styles.button, isLoading && { opacity: 0.7 }]}
+        style={isLoading ? styles.buttonLoading : styles.button}
         onPress={handleSignup}
         disabled={isLoading}
       >
@@ -78,11 +83,14 @@ export default function SignupScreen() {
   );
 }
 
+const buttonBase: any = { backgroundColor: '#4F46E5', padding: 12, borderRadius: 8, alignItems: 'center', marginTop: 8 };
+
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', padding: 20, backgroundColor: '#fff' },
   title: { fontSize: 24, fontWeight: '600', marginBottom: 20, textAlign: 'center' },
   input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginBottom: 12 },
-  button: { backgroundColor: '#4F46E5', padding: 12, borderRadius: 8, alignItems: 'center', marginTop: 8 },
+  button: buttonBase,
+  buttonLoading: { ...buttonBase, opacity: 0.7 },
   buttonText: { color: '#fff', fontWeight: '600' },
   link: { color: '#4F46E5', marginTop: 12, textAlign: 'center' },
   error: { color: 'red', marginBottom: 8, textAlign: 'center' },
